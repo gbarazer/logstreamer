@@ -6,8 +6,7 @@
  * Log Streamer PHP
  * @version 0.0.1
  * @author Olivier Doucet <odoucet@php.net>
- *
- *
+ * @author Gabriel Barazer <gabriel@oxeva.fr>
  */
 
 define('DEBUG', 1);
@@ -37,10 +36,12 @@ while (true) {
     $logStreamer->write();
 
     // @todo intercept signals to write Statistics somewhere
-    if (time() != $lastPrint) {
+    if (DEBUG && time() != $lastPrint) {
         $lastPrint = time();
         $infos = $logStreamer->getStats();
-        printf("Read: %6.1f MB Write: %6.1f MB  Discarded: %6.1f MB  BufferSize: %5.0f + %4.0f KB  Memory: %4.1f MB (peak: %4.1f MB)\r", 
+        printf(
+			"Read: %6.1f MB Write: %6.1f MB  Discarded: %6.1f MB  ".
+			"BufferSize: %5.0f + %4.0f KB  Memory: %4.1f MB (peak: %4.1f MB)\r", 
             $infos['readBytes']/1024/1024, 
             $infos['writtenBytes']/1024/1024,
             $infos['dataDiscarded']/1024/1024,

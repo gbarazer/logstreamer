@@ -39,7 +39,7 @@ while (true) {
     $conn = @stream_socket_accept($socket, 1);
     if ($conn === false) {
         file_put_contents('/tmp/null', ".", FILE_APPEND);
-        usleep(10000);
+        usleep(1000);
         continue;
     }
     stream_set_blocking($conn, 0);
@@ -53,7 +53,7 @@ while (true) {
         debug("(read header) tmpData length=".strlen($tmpData)."\n");
         
         if ($tmpData == '') {
-            usleep(10000);
+            usleep(1000);
             continue;
         }
         
@@ -71,7 +71,7 @@ while (true) {
             $contentLength = $posL[1];
             
             // Compression
-            if (preg_match('@X-Content-Encoding: ([a-z]{1,})@', $tmpData, $posL)) {
+            if (preg_match('@Content-Encoding: ([a-z]{1,})@', $tmpData, $posL)) {
                 $compression = trim($posL[1]);
                 debug("(COMPRESSION DETECTED !)\n");
             } else {
@@ -114,9 +114,11 @@ while (true) {
                 fclose($conn);
                 break;
             }
-            debug("\nFinish reading. Data: ".strlen($tmpData).
-                              " bytes - Written: ".$writtenBytes."\n");
-                              
+            debug(
+                "\nFinish reading. Data: ".strlen($tmpData).
+                " bytes - Written: ".$writtenBytes."\n"
+            );
+            
             fwrite($conn, "HTTP/1.1 200 OK\r\n\r\nEverything fine\r\n\r\n");
             fclose($conn);
             break;
@@ -130,15 +132,16 @@ while (true) {
         usleep(1000);
     }
     debug("Closing connection\n");
-    usleep(10000);
+    usleep(1000);
 }
 fclose($socket);
 
 function gzdecode($data) 
 { 
-   return gzinflate(substr($data,10,-8)); 
+   return gzinflate(substr($data, 10, -8)); 
 }
 
-function debug($str) {
+function debug($str)
+{
     @file_put_contents('/tmp/null', $str, FILE_APPEND);
 }
